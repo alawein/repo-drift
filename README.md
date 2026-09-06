@@ -157,8 +157,8 @@ GitHub Action or the CLI.
 ## Release and versioning
 
 - Version source: `pyproject.toml` (`project.version`).
-- Publish mode: manual — tag a release (e.g. `v0.1.0`) after bumping the
-  version in `pyproject.toml`; downstream users pin the tag or its
+- Publish mode: manual (tag a release, e.g. `v0.1.0`, after bumping the
+  version in `pyproject.toml`); downstream users pin the tag or its
   commit SHA in their workflow's `uses:` line.
 
 ## License and attribution
