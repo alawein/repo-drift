@@ -9,6 +9,22 @@ dependency. The `visibility` and `branch_name` checks optionally invoke the
 locally authenticated `gh` command only when their rules require repository
 metadata; failures become warnings instead of failing a workflow.
 
+## Purpose
+
+Catches a repo's documentation and config drifting away from what it
+actually claims: a stale default branch name in the docs, a dependency
+named in prose but missing from the manifest, a visibility mismatch, a
+required file that went missing. Consumed as a GitHub Action in CI or as
+a standalone CLI for a local check.
+
+## Install
+
+```bash
+python -m pip install repo-drift
+```
+
+Or pin the GitHub Action (see below) without installing anything locally.
+
 ## GitHub Action
 
 Check out the repository before using the action:
@@ -107,6 +123,43 @@ pytest
 ruff check .
 python -m build
 ```
+
+## Architecture
+
+- `src/repo_drift/cli.py`, `__main__.py`: entry points for `repo-drift check`
+  and `repo-drift explain`.
+- `src/repo_drift/runner.py`, `rules.py`: load `.drift-rules.yaml` and run the
+  configured detectors against the target directory.
+- `src/repo_drift/detectors/`: one module per detector (`branch_name`,
+  `claimed_dep`, `feature_claim`, `missing_file`, `stale_config`,
+  `visibility`); see `registry.py` for how they're wired up.
+- `src/repo_drift/reporters.py`, `finding.py`: turn detector results into
+  plain-text or GitHub Actions annotation output.
+- `src/repo_drift/_github.py`: the only network path, used solely by the
+  `visibility` and `branch_name` detectors' optional `gh` fallback.
+- `action.yml`: the composite GitHub Action wrapping the CLI.
+
+See `docs/architecture/topology.md` for the full tree.
+
+## Docs map
+
+- `README.md` (this file)
+- `docs/architecture/topology.md`
+- `LICENSE`
+
+## Consumers
+
+None inside the `alawein` hub repo's own CI as of this check (no workflow
+file there references `alawein/repo-drift`). It is a standalone
+tool/action any repo (in or outside the `alawein` org) can adopt via the
+GitHub Action or the CLI.
+
+## Release and versioning
+
+- Version source: `pyproject.toml` (`project.version`).
+- Publish mode: manual — tag a release (e.g. `v0.1.0`) after bumping the
+  version in `pyproject.toml`; downstream users pin the tag or its
+  commit SHA in their workflow's `uses:` line.
 
 ## License and attribution
 
