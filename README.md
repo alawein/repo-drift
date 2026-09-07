@@ -1,15 +1,6 @@
 # repo-drift
 
-`repo-drift` is a small, configurable validator for repository claims and
-configuration. It emits standard GitHub Actions workflow commands when run
-with `--reporter github`, so errors appear as inline annotations.
-
-The package has no credentials, network SDK, telemetry, or private package
-dependency. The `visibility` and `branch_name` checks optionally invoke the
-locally authenticated `gh` command only when their rules require repository
-metadata; failures become warnings instead of failing a workflow.
-
-## Purpose
+## The claim
 
 Catches a repo's documentation and config drifting away from what it
 actually claims: a stale default branch name in the docs, a dependency
@@ -17,13 +8,34 @@ named in prose but missing from the manifest, a visibility mismatch, a
 required file that went missing. Consumed as a GitHub Action in CI or as
 a standalone CLI for a local check.
 
-## Install
+### Status
+
+Preview-only. This repository has no automated CI. Run the development checks
+below before relying on a new revision.
+
+## Run it
+
+Requires Python 3.11+ and Git. Install from the pinned source revision below.
+The PyPI package named `repo-drift` belongs to a different project.
 
 ```bash
-python -m pip install repo-drift
+python -m pip install "repo-drift @ git+https://github.com/alawein/repo-drift.git@d0ba158fa9188298f57e81c2a2260398a50d5b40"
+repo-drift explain
 ```
 
 Or pin the GitHub Action (see below) without installing anything locally.
+
+## What it is
+
+A configurable Python CLI and GitHub Action for repository maintainers.
+With `--reporter github`, it emits workflow commands that render findings as
+inline annotations.
+
+## What it is not
+
+It has no credential store, network SDK, telemetry, or private package dependency.
+The `visibility` and `branch_name` checks can invoke the locally authenticated
+`gh` command when their rules require metadata; failures become warnings.
 
 ## GitHub Action
 
@@ -60,9 +72,7 @@ private dependency.
 ## CLI
 
 ```bash
-python -m pip install repo-drift
 repo-drift check --reporter github
-repo-drift explain
 ```
 
 `repo-drift check` reads `.drift-rules.yaml` from the target directory by
@@ -110,10 +120,11 @@ Detectors:
   targets against repository-local JSON Schema files.
 - `stale_config`: detects common JavaScript framework config files whose
   package is absent from `package.json`.
-- `visibility`: compares configured public/private visibility with GitHub.
+- `visibility` compares configured public/private visibility with GitHub.
 
 `schemas` deliberately points to JSON Schema files in the repository being
 checked; repo-drift includes no organization-specific metadata schema.
+JSON Schema validation may retrieve remote `$ref` targets.
 
 ## Development
 
@@ -135,17 +146,17 @@ python -m build
   `visibility`); see `registry.py` for how they're wired up.
 - `src/repo_drift/reporters.py`, `finding.py`: turn detector results into
   plain-text or GitHub Actions annotation output.
-- `src/repo_drift/_github.py`: the only network path, used solely by the
-  `visibility` and `branch_name` detectors' optional `gh` fallback.
+- `src/repo_drift/_github.py`: optional GitHub metadata lookups used by the
+  `visibility` and `branch_name` detectors.
 - `action.yml`: the composite GitHub Action wrapping the CLI.
 
 See `docs/architecture/topology.md` for the full tree.
 
 ## Docs map
 
-- `README.md` (this file)
-- `docs/architecture/topology.md`
-- `LICENSE`
+- [README.md](README.md) (this file)
+- [Architecture topology](docs/architecture/topology.md)
+- [License](LICENSE)
 
 ## Consumers
 
@@ -161,6 +172,6 @@ GitHub Action or the CLI.
   version in `pyproject.toml`); downstream users pin the tag or its
   commit SHA in their workflow's `uses:` line.
 
-## License and attribution
+## License
 
 Licensed under the [MIT License](LICENSE).
