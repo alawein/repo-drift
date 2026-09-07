@@ -37,6 +37,15 @@ It has no credential store, network SDK, telemetry, or private package dependenc
 The `visibility` and `branch_name` checks can invoke the locally authenticated
 `gh` command when their rules require metadata; failures become warnings.
 
+## Purpose
+
+Check declared repository rules before publishing documentation or merging a
+pull request.
+
+## Install
+
+Use [Run it](#run-it) for a local installation, or the GitHub Action below.
+
 ## GitHub Action
 
 Check out the repository before using the action:
