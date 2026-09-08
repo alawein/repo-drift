@@ -13,12 +13,17 @@ from repo_drift.reporters import render_github
 def test_explain_lists_all_builtin_detectors(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["explain"]) == 0
     assert capsys.readouterr().out.splitlines() == [
+        "agent_contract",
         "branch_name",
         "claimed_dep",
         "feature_claim",
+        "kernel_conformance",
+        "metadata_schema",
         "missing_file",
         "stale_config",
         "visibility",
+        "workflow_pin",
+        "worktree_registry",
     ]
 
 
