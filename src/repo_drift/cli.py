@@ -28,12 +28,17 @@ from repo_drift.runner import run_detectors
 def default_registry() -> DetectorRegistry:
     """Return the production registry with all built-in detectors registered."""
     from repo_drift.detectors import (
+        agent_contract,
         branch_name,
         claimed_dep,
         feature_claim,
+        kernel_conformance,
+        metadata_schema,
         missing_file,
         stale_config,
         visibility,
+        workflow_pin,
+        worktree_registry,
     )
 
     registry = DetectorRegistry()
@@ -43,6 +48,15 @@ def default_registry() -> DetectorRegistry:
     registry.register("missing_file", missing_file.detect)
     registry.register("stale_config", stale_config.detect)
     registry.register("visibility", visibility.detect)
+    # Kernel canonicalization detectors (opt-in: no-op unless their required
+    # detector_config keys are present in .drift-rules.yaml, same convention
+    # as `visibility` above). See alawein docs/governance/kernel-spec.md and
+    # docs/internal/plans/2026-09-08-kernel-canonicalization.md Phase 2.
+    registry.register("kernel_conformance", kernel_conformance.detect)
+    registry.register("workflow_pin", workflow_pin.detect)
+    registry.register("agent_contract", agent_contract.detect)
+    registry.register("metadata_schema", metadata_schema.detect)
+    registry.register("worktree_registry", worktree_registry.detect)
     return registry
 
 

@@ -129,11 +129,29 @@ Detectors:
   targets against repository-local JSON Schema files.
 - `stale_config`: detects common JavaScript framework config files whose
   package is absent from `package.json`.
-- `visibility` compares configured public/private visibility with GitHub.
+- `visibility`: compares configured public/private visibility with GitHub.
+- `kernel_conformance`: compares `.kernel-manifest.json` against an expected
+  kernel version and file-hash map. Opt-in: no-op unless
+  `expected_kernel_version` and `expected_files` are configured.
+- `workflow_pin`: flags reusable-workflow `uses:` references in
+  `.github/workflows/*.yml` that don't match a single pinned SHA. Opt-in:
+  no-op unless `expected_sha` is configured.
+- `agent_contract`: checks `AGENTS.md` for required managed sections.
+  Opt-in: no-op unless `required_sections` is configured.
+- `metadata_schema`: validates `service-metadata.yaml` (or another target)
+  against a local JSON Schema. Opt-in: no-op unless `schema` is configured.
+- `worktree_registry`: local-only; warns when `git worktree list` reports a
+  worktree outside the configured registered roots. Opt-in: no-op unless
+  `registered_roots` is configured.
 
 `schemas` deliberately points to JSON Schema files in the repository being
 checked; repo-drift includes no organization-specific metadata schema.
-JSON Schema validation may retrieve remote `$ref` targets.
+JSON Schema validation may retrieve remote `$ref` targets. The five
+kernel-canonicalization detectors above follow the same "opt-in via
+required config keys" convention as `visibility`: they are always
+registered, but stay silent until a repo's `.drift-rules.yaml`
+`detector_config` supplies their required keys, so adoption happens per
+wave rather than fleet-wide on upgrade.
 
 ## Development
 
@@ -152,7 +170,9 @@ python -m build
   configured detectors against the target directory.
 - `src/repo_drift/detectors/`: one module per detector (`branch_name`,
   `claimed_dep`, `feature_claim`, `missing_file`, `stale_config`,
-  `visibility`); see `registry.py` for how they're wired up.
+  `visibility`, `kernel_conformance`, `workflow_pin`, `agent_contract`,
+  `metadata_schema`, `worktree_registry`); see `registry.py` for how they're
+  wired up.
 - `src/repo_drift/reporters.py`, `finding.py`: turn detector results into
   plain-text or GitHub Actions annotation output.
 - `src/repo_drift/_github.py`: optional GitHub metadata lookups used by the
