@@ -129,7 +129,7 @@ Detectors:
   targets against repository-local JSON Schema files.
 - `stale_config`: detects common JavaScript framework config files whose
   package is absent from `package.json`.
-- `visibility`: compares configured public/private visibility with GitHub.
+- visibility detector: compares configured public/private settings with GitHub.
 - `kernel_conformance`: compares `.kernel-manifest.json` against an expected
   kernel version and file-hash map. Opt-in: no-op unless
   `expected_kernel_version` and `expected_files` are configured.
